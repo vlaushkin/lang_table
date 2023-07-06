@@ -3,7 +3,7 @@ description: Demonstrates how to use the lang_table plugin.
 publish_to: 'none'
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+  sdk: ">=2.12.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -11,7 +11,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
+  cupertino_icons: ^1.0.5
   flutter_localizations:
     sdk: flutter
 
@@ -20,7 +20,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  gen_lang: 0.1.0
+  gen_lang:
+    git:
+      url: git@github.com:vlaushkin/gen_lang.git
+      ref: 34bfbc8
   lang_table:
     path: ../
 
