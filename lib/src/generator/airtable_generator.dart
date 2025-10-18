@@ -101,16 +101,30 @@ class AirTableGenerator implements PlatformGenerator {
         continue;
       }
 
-      // Skip records with Notes starting with "DEL"
+      // Check Notes field for special markers
       dynamic notes = fields['Notes'];
+      bool isAndroidKey = false;
+
       if (notes != null) {
         String notesStr = notes.toString();
+
+        // Skip records with Notes starting with "DEL"
         if (notesStr.startsWith('DEL')) {
           continue;
+        }
+
+        // Check if this key is marked for Android
+        if (notesStr.contains('__android__')) {
+          isAndroidKey = true;
         }
       }
 
       String? jsonKey = fields[jsonKeyHeader];
+
+      // Add to Android keys list if marked
+      if (isAndroidKey) {
+        jsonBuilder.addAndroidKey(jsonKey);
+      }
 
       for (ExtractedHeader localeHeader in localeHeaderList) {
         dynamic message = fields[localeHeader.header];

@@ -19,6 +19,9 @@ class JsonBuilder {
 
   Map<String, bool> isLocaleFirstWriteMap = {};
 
+  // List of keys marked for Android platform
+  List<String> androidKeys = [];
+
   bool initialize(List<ExtractedHeader> allHeaders) {
     jsonKeyHeader = _pullJsonKeyHeaderFromList(allHeaders);
     localeMessageHeaderList = allHeaders;
@@ -58,6 +61,12 @@ class JsonBuilder {
     }
   }
 
+  void addAndroidKey(String? jsonKey) {
+    if (null != jsonKey && !androidKeys.contains(jsonKey)) {
+      androidKeys.add(jsonKey);
+    }
+  }
+
   void generateFiles(String? outputDir) {
     Directory current = Directory.current;
 
@@ -72,6 +81,16 @@ class JsonBuilder {
       Map? localeBuilder = localeStringBuilderMap[fileEntry.key];
       // Generate File
       generatedFile.writeAsStringSync(json.encode(localeBuilder));
+    }
+
+    // Generate android_strings.json if there are Android-specific keys
+    if (androidKeys.isNotEmpty) {
+      File androidFile =
+          File(path.join(current.path, outputDir, 'android_strings.json'));
+      if (!androidFile.existsSync()) {
+        androidFile.createSync(recursive: true);
+      }
+      androidFile.writeAsStringSync(json.encode({'keys': androidKeys}));
     }
   }
 
