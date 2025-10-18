@@ -101,6 +101,15 @@ class AirTableGenerator implements PlatformGenerator {
         continue;
       }
 
+      // Skip records with Notes starting with "DEL"
+      dynamic notes = fields['Notes'];
+      if (notes != null) {
+        String notesStr = notes.toString();
+        if (notesStr.startsWith('DEL')) {
+          continue;
+        }
+      }
+
       String? jsonKey = fields[jsonKeyHeader];
 
       for (ExtractedHeader localeHeader in localeHeaderList) {
