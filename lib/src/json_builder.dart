@@ -22,6 +22,9 @@ class JsonBuilder {
   // List of keys marked for Android platform
   List<String> androidKeys = [];
 
+  // List of keys marked for iOS platform
+  List<String> iosKeys = [];
+
   bool initialize(List<ExtractedHeader> allHeaders) {
     jsonKeyHeader = _pullJsonKeyHeaderFromList(allHeaders);
     localeMessageHeaderList = allHeaders;
@@ -67,6 +70,12 @@ class JsonBuilder {
     }
   }
 
+  void addIosKey(String? jsonKey) {
+    if (null != jsonKey && !iosKeys.contains(jsonKey)) {
+      iosKeys.add(jsonKey);
+    }
+  }
+
   void generateFiles(String? outputDir) {
     Directory current = Directory.current;
 
@@ -91,6 +100,16 @@ class JsonBuilder {
         androidFile.createSync(recursive: true);
       }
       androidFile.writeAsStringSync(json.encode({'keys': androidKeys}));
+    }
+
+    // Generate ios_strings.json if there are iOS-specific keys
+    if (iosKeys.isNotEmpty) {
+      File iosFile =
+          File(path.join(current.path, outputDir, 'ios_strings.json'));
+      if (!iosFile.existsSync()) {
+        iosFile.createSync(recursive: true);
+      }
+      iosFile.writeAsStringSync(json.encode({'keys': iosKeys}));
     }
   }
 
