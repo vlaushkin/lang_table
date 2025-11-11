@@ -25,6 +25,9 @@ class JsonBuilder {
   // List of keys marked for iOS platform
   List<String> iosKeys = [];
 
+  // List of keys marked for Web platform
+  List<String> webKeys = [];
+
   bool initialize(List<ExtractedHeader> allHeaders) {
     jsonKeyHeader = _pullJsonKeyHeaderFromList(allHeaders);
     localeMessageHeaderList = allHeaders;
@@ -76,6 +79,12 @@ class JsonBuilder {
     }
   }
 
+  void addWebKey(String? jsonKey) {
+    if (null != jsonKey && !webKeys.contains(jsonKey)) {
+      webKeys.add(jsonKey);
+    }
+  }
+
   void generateFiles(String? outputDir) {
     Directory current = Directory.current;
 
@@ -110,6 +119,16 @@ class JsonBuilder {
         iosFile.createSync(recursive: true);
       }
       iosFile.writeAsStringSync(json.encode({'keys': iosKeys}));
+    }
+
+    // Generate web_strings.json if there are Web-specific keys
+    if (webKeys.isNotEmpty) {
+      File webFile =
+          File(path.join(current.path, outputDir, 'web_strings.json'));
+      if (!webFile.existsSync()) {
+        webFile.createSync(recursive: true);
+      }
+      webFile.writeAsStringSync(json.encode({'keys': webKeys}));
     }
   }
 

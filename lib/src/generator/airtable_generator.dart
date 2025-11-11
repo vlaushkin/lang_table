@@ -105,6 +105,7 @@ class AirTableGenerator implements PlatformGenerator {
       dynamic notes = fields['Notes'];
       bool isAndroidKey = false;
       bool isIosKey = false;
+      bool isWebKey = false;
 
       if (notes != null) {
         String notesStr = notes.toString();
@@ -123,6 +124,11 @@ class AirTableGenerator implements PlatformGenerator {
         if (notesStr.contains('__ios__')) {
           isIosKey = true;
         }
+
+        // Check if this key is marked for Web
+        if (notesStr.contains('__web__')) {
+          isWebKey = true;
+        }
       }
 
       String? jsonKey = fields[jsonKeyHeader];
@@ -135,6 +141,11 @@ class AirTableGenerator implements PlatformGenerator {
       // Add to iOS keys list if marked
       if (isIosKey) {
         jsonBuilder.addIosKey(jsonKey);
+      }
+
+      // Add to Web keys list if marked
+      if (isWebKey) {
+        jsonBuilder.addWebKey(jsonKey);
       }
 
       for (ExtractedHeader localeHeader in localeHeaderList) {
