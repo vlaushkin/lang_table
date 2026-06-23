@@ -1,6 +1,6 @@
 library json_builder;
 
-import 'dart:convert' show json;
+import 'dart:convert' show JsonEncoder;
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
@@ -8,6 +8,10 @@ import 'package:path/path.dart' as path;
 import 'extra_key_value.dart';
 
 class JsonBuilder {
+  // Pretty-printer with 2-space indentation so generated JSON is
+  // human-readable and produces clean diffs in git.
+  static const JsonEncoder _jsonEncoder = JsonEncoder.withIndent('  ');
+
   List<ExtractedHeader> localeMessageHeaderList = [];
   ExtractedHeader? jsonKeyHeader;
 
@@ -98,7 +102,7 @@ class JsonBuilder {
 
       Map? localeBuilder = localeStringBuilderMap[fileEntry.key];
       // Generate File
-      generatedFile.writeAsStringSync(json.encode(localeBuilder));
+      generatedFile.writeAsStringSync(_jsonEncoder.convert(localeBuilder));
     }
 
     // Generate android_strings.json if there are Android-specific keys
@@ -108,7 +112,7 @@ class JsonBuilder {
       if (!androidFile.existsSync()) {
         androidFile.createSync(recursive: true);
       }
-      androidFile.writeAsStringSync(json.encode({'keys': androidKeys}));
+      androidFile.writeAsStringSync(_jsonEncoder.convert({'keys': androidKeys}));
     }
 
     // Generate ios_strings.json if there are iOS-specific keys
@@ -118,7 +122,7 @@ class JsonBuilder {
       if (!iosFile.existsSync()) {
         iosFile.createSync(recursive: true);
       }
-      iosFile.writeAsStringSync(json.encode({'keys': iosKeys}));
+      iosFile.writeAsStringSync(_jsonEncoder.convert({'keys': iosKeys}));
     }
 
     // Generate web_strings.json if there are Web-specific keys
@@ -128,7 +132,7 @@ class JsonBuilder {
       if (!webFile.existsSync()) {
         webFile.createSync(recursive: true);
       }
-      webFile.writeAsStringSync(json.encode({'keys': webKeys}));
+      webFile.writeAsStringSync(_jsonEncoder.convert({'keys': webKeys}));
     }
   }
 

@@ -77,6 +77,31 @@ class AirTableGenerator implements PlatformGenerator {
     return null;
   }
 
+  // Table authors hand-write control characters inside a cell as escape
+  // sequences (`\n`, `\r`, `\t`, ` `, ...) and sometimes double the
+  // backslash (`\\n`). Interpret one or two leading backslashes followed by a
+  // known escape body into the real character, so the generated JSON holds
+  // actual data and no shell post-processing (sed) is needed downstream.
+  static final RegExp _escapeSequence =
+      RegExp(r'\\{1,2}(n|r|t|u[0-9A-Fa-f]{4})');
+
+  String normalizeEscapeSequences(String message) {
+    return message.replaceAllMapped(_escapeSequence, (match) {
+      String body = match.group(1)!;
+      switch (body[0]) {
+        case 'n':
+          return '\n';
+        case 'r':
+          return '\r';
+        case 't':
+          return '\t';
+        case 'u':
+          return String.fromCharCode(int.parse(body.substring(1), radix: 16));
+      }
+      return match.group(0)!;
+    });
+  }
+
   List<ExtractedHeader> extractHeaderList(record) {
     List<ExtractedHeader> headers = [];
 
@@ -155,6 +180,9 @@ class AirTableGenerator implements PlatformGenerator {
         }
 
         if (null != message) {
+          if (message is String) {
+            message = normalizeEscapeSequences(message);
+          }
           jsonBuilder.writeData(jsonKey, localeHeader.header, message);
         }
       }
